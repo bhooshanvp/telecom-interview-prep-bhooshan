@@ -1,710 +1,151 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Telecom Engineer Interview Simulator by Bhooshan</title>
-<meta name="description" content="Interactive mock interview app for Telecom Engineers: 4G (LTE/LTE-A), 5G (NR), IoT, RAN, Optimization & Cloud, plus HR questions. Single-file, production-grade, with depth levels." />
-<style>
-  :root{
-    --bg:#0b0f14; --card:#121923; --muted:#121a25; --text:#e8eef7; --sub:#a8b3c7;
-    --accent:#6fd0ff; --accent2:#7bffb0; --border:#253449; --good:#20d977; --warn:#ffb86b;
-    --shadow:0 8px 24px rgba(0,0,0,.35); --r:16px; --r-lg:20px; --trans:160ms ease;
-  }
-  *{box-sizing:border-box} html,body{height:100%}
-  body{margin:0;color:var(--text);background: radial-gradient(1200px 800px at 10% -10%, #132033 0%, #0b0f14 45%) fixed;font:16px/1.55 Inter, ui-sans-serif, -apple-system, Segoe UI, Roboto, Arial}
-  header{position:sticky;top:0;z-index:5;backdrop-filter:blur(10px);background:linear-gradient(180deg, rgba(15,22,33,.9), rgba(15,22,33,.6));border-bottom:1px solid var(--border)}
-  .wrap{max-width:1200px;margin:0 auto;padding:14px 20px;display:flex;gap:14px;align-items:center}
-  .logo{width:44px;height:44px;border-radius:12px;background:conic-gradient(from 210deg,var(--accent),var(--accent2),#b38bff,var(--accent));box-shadow:inset 0 0 16px rgba(255,255,255,.2)}
-  h1{margin:0;font-size:clamp(18px,2.2vw,26px)}
-  .subtitle{color:var(--sub);font-size:.95rem}
-  .pill{margin-left:auto;font-size:.85rem;color:#bfe9ff;border:1px solid #2d4662;padding:6px 10px;border-radius:999px;background:#0e1b2a}
-  main{max-width:1200px;margin:18px auto;padding:0 20px;display:grid;gap:18px;grid-template-columns:320px 1fr}
-  @media (max-width:980px){ main{grid-template-columns:1fr} }
-  .panel{background:linear-gradient(180deg,#101722,#0f1621);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:16px;position:sticky;top:84px;align-self:start}
-  .panel h2{margin:6px 0 10px;font-size:1.05rem}
-  .filters{display:grid;gap:10px}
-  .chip{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:var(--muted);transition:transform var(--trans),border-color var(--trans)}
-  .chip:hover{transform:translateY(-1px);border-color:#2f425a}
-  .chip input{accent-color:var(--accent)}
-  .row{display:flex;align-items:center;gap:10px;justify-content:space-between}
-  .btn{appearance:none;border:1px solid var(--border);background:linear-gradient(180deg,#142033,#0f1927);color:var(--text);padding:10px 12px;border-radius:12px;cursor:pointer;transition:transform var(--trans),border-color var(--trans),box-shadow var(--trans)}
-  .btn:hover{transform:translateY(-1px);border-color:#2c405a}
-  .btn:active{transform:translateY(0) scale(.99)}
-  .btn.primary{border-color:rgba(111,208,255,.5);box-shadow:inset 0 0 18px rgba(111,208,255,.08),0 8px 24px rgba(20,120,200,.15)}
-  .btn.small{font-size:.85rem;padding:8px 10px}
-  .progress{margin-top:10px;background:#0c131d;border:1px solid var(--border);border-radius:999px;height:10px;overflow:hidden}
-  .progress .bar{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#b38bff,var(--accent2));transition:width .25s ease}
-  .tiny{color:var(--sub);font-size:.9rem}
-  .card{background:linear-gradient(180deg,#111925,#0e1520 60%,#0b111a);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow);padding:18px}
-  .qhead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px}
-  .leftstack{display:flex;gap:10px;align-items:center}
-  .tag{font-size:.75rem;padding:6px 10px;border-radius:999px;border:1px solid var(--border);color:#bfe9ff;background:#102237}
-  .qid{color:#8fb4d6;font-size:.85rem}
-  .question{font-size:clamp(18px,1.8vw,22px);line-height:1.4;margin:8px 0 6px;font-weight:700}
-  .controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
-  .answer{margin-top:8px;background:#0b1320;border:1px solid #1c2a3e;border-radius:12px;padding:0 14px;max-height:0;opacity:0;overflow:hidden;transition:max-height .45s ease,opacity .3s ease,padding .3s ease,margin .3s ease}
-  .answer.open{margin-top:12px;padding:14px;max-height:3600px;opacity:1}
-  .answer h4{margin:10px 0 8px;font-size:1rem}
-  .cols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  @media (max-width:800px){.cols{grid-template-columns:1fr}}
-  .answer ul{margin:8px 0 8px 18px}
-  .answer li{margin:6px 0}
-  .badge{font-size:.75rem;border:1px solid #2b523a;background:#0f2017;color:#bdfcd2;border-radius:999px;padding:4px 8px}
-  .mastered{border:1px solid rgba(32,217,119,.35);box-shadow:0 0 0 1px rgba(32,217,119,.08) inset,0 8px 24px rgba(32,217,119,.08)}
-  details.gloss{margin-top:16px;border:1px dashed var(--border);border-radius:12px;padding:10px 12px}
-  details.gloss summary{cursor:pointer;color:#bfe9ff}
-  .gloss-top{display:flex;gap:8px;align-items:center;margin:8px 0 10px}
-  .search{flex:1;position:relative}
-  .search input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #213148;background:#0e1b2a;color:#e6f3ff;outline:none}
-  .search input:focus{box-shadow:0 0 0 3px rgba(111,208,255,.25)}
-  .count{font-size:.85rem;color:#9bd1ff}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  @media (max-width:700px){.grid{grid-template-columns:1fr}}
-  .def{display:flex;gap:8px;align-items:flex-start;background:#0e1b2a;border:1px solid #213148;border-radius:10px;padding:8px}
-  .abbr{min-width:110px;font-weight:700;color:#d7f1ff}
-  mark{background:rgba(111,208,255,.25);padding:0 2px;border-radius:4px}
-  .depth{display:flex;gap:6px;align-items:center}
-  .depth select{background:#0e1b2a;border:1px solid #213148;color:#e6f3ff;border-radius:8px;padding:6px 8px}
-  footer{max-width:1200px;margin:24px auto 40px;padding:0 20px;color:var(--sub)}
-  .foot{border-top:1px dashed var(--border);padding-top:14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
-  .credits{font-weight:700;color:#d5f6ff}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Telecom Interview Preparation - 250+ Questions</title>
+    <link rel="stylesheet" href="style.css">
+    <meta name="description" content="Comprehensive telecom interview preparation with 250+ accurate questions covering L1, L2, L3 support and behavioral skills">
 </head>
 <body>
-<header>
-  <div class="wrap">
-    <div class="logo" aria-hidden="true"></div>
-    <div>
-      <h1>Telecom Engineer Interview Simulator by Bhooshan</h1>
-      <div class="subtitle">4G (LTE/LTE-A), 5G (NR), IoT, RAN, Optimization & Cloud — plus Non-Technical (HR) with tips.</div>
-    </div>
-    <div id="totalCountPill" class="pill" aria-live="polite">Loading…</div>
-  </div>
-</header>
+    <div class="container">
+        <header class="header">
+            <h1>Telecom Interview Preparation by Bhooshan</h1>
+            <p class="subtitle">Master L1, L2, L3 Support & Behavioral Skills with 250+ Industry-Accurate Questions</p>
+            <div class="stats-row">
+                <div class="stat-item">
+                    <span class="stat-number" id="total-questions">250</span>
+                    <span class="stat-label">Total Questions</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="mastered-count">0</span>
+                    <span class="stat-label">Mastered</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="completion-rate">0%</span>
+                    <span class="stat-label">Complete</span>
+                </div>
+            </div>
+        </header>
 
-<main>
-  <!-- Left: Controls -->
-  <aside class="panel" aria-label="Controls and Filters">
-    <h2>Topics</h2>
-    <div id="filters" class="filters"></div>
+        <div class="controls-section">
+            <div class="control-group">
+                <label class="form-label">Filter by Category</label>
+                <div class="filter-panel">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="l1-filter" checked>
+                        <span class="checkbox-custom"></span>
+                        <span>L1 Support (65)</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="l2-filter" checked>
+                        <span class="checkbox-custom"></span>
+                        <span>L2 Support (65)</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="l3-filter" checked>
+                        <span class="checkbox-custom"></span>
+                        <span>L3 Support (65)</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="behavioral-filter" checked>
+                        <span class="checkbox-custom"></span>
+                        <span>Behavioral (55)</span>
+                    </label>
+                </div>
+            </div>
 
-    <div class="row" style="margin-top:10px">
-      <label class="row tiny" style="width:100%">
-        <span>Hide mastered questions</span>
-        <input type="checkbox" id="hideMastered"/>
-      </label>
-    </div>
+            <div class="control-group">
+                <label class="form-label" for="depth-toggle">Detail Level</label>
+                <select id="depth-toggle" class="form-control depth-select">
+                    <option value="concise">📝 Concise (Summary Only)</option>
+                    <option value="standard" selected>📚 Standard (Summary + Details)</option>
+                    <option value="in-depth">🔬 In-Depth (All Sections)</option>
+                </select>
+            </div>
 
-    <div style="display:grid;gap:8px;margin-top:12px">
-      <button class="btn small" id="resetMastered">Reset Mastered</button>
-      <button class="btn small" id="shuffleBtn" title="Shuffle the filtered pool">Shuffle Pool</button>
-      <button class="btn small" id="shareBtn" title="Copy a shareable link of your current session">🔗 Copy Shareable Link</button>
-    </div>
-
-    <div class="row" style="margin-top:14px">
-      <div class="tiny" id="counter">Question – of –</div>
-      <div class="tiny" id="posLabel"></div>
-    </div>
-    <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="Progress">
-      <div id="bar" class="bar"></div>
-    </div>
-
-    <div style="margin-top:12px" class="tiny">
-      Keys: ←/→ navigate • R random • A answer • M mastered
-    </div>
-  </aside>
-
-  <!-- Right: Card -->
-  <section class="card" id="card" aria-live="polite">
-    <div class="qhead">
-      <div class="leftstack">
-        <div class="tag" id="tag">—</div>
-        <div class="qid" id="qid">ID —</div>
-      </div>
-      <div class="row">
-        <div class="depth tiny">
-          <span>Detail:</span>
-          <select id="depthSel" title="Choose detail level">
-            <option value="concise">Concise</option>
-            <option value="standard" selected>Standard</option>
-            <option value="indept">In-Depth</option>
-          </select>
+            <div class="control-group">
+                <div class="action-buttons">
+                    <button class="btn btn--secondary" id="shuffle-btn">🔀 Shuffle</button>
+                    <button class="btn btn--secondary" id="reset-btn">🔄 Reset Progress</button>
+                    <button class="btn btn--primary" id="glossary-btn">📖 Glossary</button>
+                    <button class="btn btn--outline" id="share-btn">🔗 Share Progress</button>
+                </div>
+            </div>
         </div>
-        <label class="row tiny" style="margin-left:12px">
-          <input type="checkbox" id="masteredToggle"/>
-          <span>Mastered</span>
-        </label>
-      </div>
-    </div>
 
-    <div id="question" class="question">Loading…</div>
-
-    <div class="controls">
-      <button class="btn" id="prevBtn">← Previous</button>
-      <button class="btn primary" id="revealBtn" aria-expanded="false">Reveal Answer</button>
-      <button class="btn" id="nextBtn">Next →</button>
-      <button class="btn" id="randomBtn">🎲 Random</button>
-    </div>
-
-    <div id="answer" class="answer" aria-hidden="true"></div>
-
-    <details class="gloss" open>
-      <summary><strong>Glossary</strong> — Full forms for abbreviations used</summary>
-      <div class="gloss-top">
-        <div class="search">
-          <input id="glossSearch" type="search" placeholder="Search abbreviations (e.g., MME, RSRP, UPF)…" aria-label="Search glossary" />
+        <div class="progress-section">
+            <div class="progress-info">
+                <span id="progress-text">0 of 250 questions mastered</span>
+                <span class="progress-percentage" id="progress-percentage">0%</span>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
         </div>
-        <div id="glossCount" class="count">— items</div>
-      </div>
-      <div id="glossary" class="grid" style="margin-top:10px"></div>
-    </details>
-  </section>
-</main>
 
-<footer>
-  <div class="foot">
-    <div class="credits">Created by: Bhooshan Pattanashetti</div>
-    <div class="tiny">No tracking. Your progress & mastered list stay in this browser. Shareable link encodes only your current view.</div>
-  </div>
-</footer>
+        <div class="search-section">
+            <div class="search-container">
+                <input type="text" id="search-input" class="form-control search-input" placeholder="🔍 Search questions by topic, technology, or keyword...">
+                <button class="search-clear" id="search-clear">✕</button>
+            </div>
+            <div class="filter-summary" id="filter-summary">Showing all categories</div>
+        </div>
 
-<script>
-/* ========= Abbreviations (full forms) ========= */
-const ABBR = {
-  "3GPP":"Third Generation Partnership Project","4G":"Fourth Generation","5G":"Fifth Generation",
-  "LTE":"Long Term Evolution","LTE-A":"LTE-Advanced","NR":"New Radio","EPC":"Evolved Packet Core",
-  "MME":"Mobility Management Entity","S-GW":"Serving Gateway","P-GW":"Packet Data Network Gateway",
-  "HSS":"Home Subscriber Server","PCRF":"Policy and Charging Rules Function","PCC":"Policy and Charging Control",
-  "QoS":"Quality of Service","QCI":"QoS Class Identifier","ARP":"Allocation and Retention Priority",
-  "RRC":"Radio Resource Control","DRB":"Data Radio Bearer","NAS":"Non-Access Stratum","TA":"Tracking Area",
-  "TAU":"Tracking Area Update","PDN":"Packet Data Network","AKA":"Authentication and Key Agreement",
-  "CA":"Carrier Aggregation","CC":"Component Carrier","UE":"User Equipment","eNB":"evolved NodeB",
-  "RSRP":"Reference Signal Received Power","RSRQ":"Reference Signal Received Quality","SINR":"Signal to Interference plus Noise Ratio",
-  "HARQ":"Hybrid Automatic Repeat reQuest","ARQ":"Automatic Repeat reQuest","CQI":"Channel Quality Indicator",
-  "BSR":"Buffer Status Report","PHR":"Power Headroom Report","NSA":"Non-Standalone","SA":"Standalone",
-  "eMBB":"enhanced Mobile Broadband","URLLC":"Ultra-Reliable Low-Latency Communications","mMTC":"massive Machine Type Communications",
-  "SBA":"Service-Based Architecture","AMF":"Access and Mobility Management Function","SMF":"Session Management Function",
-  "UPF":"User Plane Function","PCF":"Policy Control Function","UDM":"Unified Data Management","NSSF":"Network Slice Selection Function",
-  "NEF":"Network Exposure Function","AF":"Application Function","NRF":"Network Repository Function",
-  "DSS":"Dynamic Spectrum Sharing","TTI":"Transmission Time Interval","MU-MIMO":"Multi-User Multiple-Input Multiple-Output",
-  "CSI-RS":"Channel State Information Reference Signal","SSB":"Synchronization Signal Block","RAN":"Radio Access Network",
-  "RU":"Radio Unit","DU":"Distributed Unit","CU":"Centralized Unit","eCPRI":"enhanced Common Public Radio Interface",
-  "F1":"NG-RAN F1 interface (CU–DU)","E1":"NG-RAN E1 interface (CU-CP ↔ CU-UP)","O1":"O-RAN management interface","A1":"O-RAN policy interface",
-  "PTP":"Precision Time Protocol","SyncE":"Synchronous Ethernet","ICIC":"Inter-Cell Interference Coordination",
-  "eICIC":"enhanced ICIC","FeICIC":"Further enhanced ICIC","PRACH":"Physical Random Access Channel","RACH":"Random Access Channel",
-  "PCI":"Physical Cell Identity","CDR":"Call Drop Rate","BLER":"Block Error Rate","DRX":"Discontinuous Reception",
-  "LPWA":"Low-Power Wide-Area","CIoT":"Cellular Internet of Things","SCEF":"Service Capability Exposure Function",
-  "NIDD":"Non-IP Data Delivery","FR1":"Frequency Range 1","FR2":"Frequency Range 2","NFV":"Network Functions Virtualization",
-  "SDN":"Software-Defined Networking","CNCF":"Cloud Native Computing Foundation","CNF":"Cloud-Native Network Function",
-  "VNF":"Virtual Network Function","KPI":"Key Performance Indicator","K8s":"Kubernetes","COTS":"Commercial Off-The-Shelf",
-  "UL/DL":"Uplink/Downlink","GUTI":"Globally Unique Temporary UE Identity","IMSI":"International Mobile Subscriber Identity",
-  "QoE":"Quality of Experience","PF":"Proportional Fair","RR":"Round Robin","MT":"Max Throughput","DCI":"Downlink Control Information",
-  "SSS/PSS":"Secondary/Primary Synchronization Signal","DRA":"Diameter Routing Agent","AAA":"Authentication, Authorization and Accounting",
-  "SR":"Scheduling Request","TTT":"Time To Trigger","TDD":"Time Division Duplex","FDD":"Frequency Division Duplex",
-  "N2":"5G AMF–gNB control interface","N3":"5G UPF–gNB user interface","N4":"5G SMF–UPF control interface","N6":"UPF–Data Network interface",
-  "FWA":"Fixed Wireless Access","VoLTE":"Voice over LTE","VoNR":"Voice over New Radio","CSFB":"Circuit Switched Fallback",
-  "RTT":"Round-Trip Time","eMTC":"enhanced Machine Type Communication","FOTA":"Firmware Over-The-Air",
-  "ULCL":"Uplink Classifier","DN":"Data Network","UP":"User Plane","CP":"Control Plane"
-};
+        <div id="questions-container" class="questions-container">
+            <div class="loading">Loading comprehensive question bank...</div>
+        </div>
 
-/* ========= Q&A Bank (condensed base answers; deep dives appended by topic engine) =========
-   NOTE: Answers now render with extra sections when Detail = "In-Depth". This keeps the file lean but educational. */
-const Q = (id,category,question,answer)=>({id,category,question,answer});
-const questions = [
-/* ===== LTE ===== */
-Q("LTE-01","4G (LTE/LTE-A)","Explain the LTE EPC (MME, S-GW, P-GW, HSS) and how control/user planes are separated.",`
-<ul>
-  <li><b>EPC:</b> all-IP core splitting <b>CP</b> (control) and <b>UP</b> (user) for scale and policy.</li>
-  <li><b>MME:</b> NAS signaling, <b>AKA</b> auth, idle mobility, bearer setup; talks to <b>HSS</b>.</li>
-  <li><b>S-GW:</b> UP anchor for mobility; buffers paging; hands user traffic toward P-GW.</li>
-  <li><b>P-GW:</b> IP allocation, <b>PCC</b>/<b>QoS</b>, charging, policy enforcement; to external <b>DN</b>.</li>
-  <li><b>HSS:</b> subscriber data (IMSI, keys, APN), produces auth vectors.</li>
-</ul>`),
-Q("LTE-02","4G (LTE/LTE-A)","Walk through LTE Attach from power-on to IP connectivity.",`
-<ul>
-  <li>UE camps, RRC setup → <b>Attach Request</b> (IMSI/GUTI, caps, last TA, APN).</li>
-  <li><b>AKA</b> with HSS → security mode; derive NAS/RRC keys.</li>
-  <li>Default EPS bearer via S-GW/P-GW → IP address + QCI/ARP → Activate on UE.</li>
-  <li>Tracking Area List → <b>Attach Accept</b>/<b>Complete</b>.</li>
-</ul>`),
-Q("LTE-03","4G (LTE/LTE-A)","Carrier Aggregation: intra vs inter-band and scheduler effects.",`
-<ul>
-  <li>Multiple <b>CC</b>s (intra/inter-band) bonded; PCC for control, SCCs for data.</li>
-  <li>Throughput gain depends on RF quality, device Cat, scheduler policy.</li>
-</ul>`),
-Q("LTE-04","4G (LTE/LTE-A)","eICIC/FeICIC: improving cell-edge performance.",`
-<ul>
-  <li><b>eICIC</b>: ABS patterns from macro; protect small-cell UEs.</li>
-  <li><b>FeICIC</b>: receiver enhancements + power coordination → better <b>SINR</b>.</li>
-</ul>`),
-Q("LTE-05","4G (LTE/LTE-A)","HARQ vs ARQ — where and why both?",`
-<ul>
-  <li><b>HARQ</b> (MAC) fast retries w/ soft combining; combats fast fading.</li>
-  <li><b>ARQ</b> (RLC) orderly delivery over longer RTT; fixes residual errors.</li>
-</ul>`),
-Q("LTE-06","4G (LTE/LTE-A)","RRC states, DRX and battery/latency trade-offs.",`
-<ul>
-  <li><b>IDLE</b>: paging; low power; access delay.</li>
-  <li><b>CONNECTED</b>: low latency; higher power; <b>DRX</b> to save energy.</li>
-</ul>`),
-Q("LTE-07","4G (LTE/LTE-A)","Scheduling inputs and common algorithms.",`
-<ul><li>Inputs: <b>CQI</b>, <b>BSR</b>, <b>PHR</b>, QoS, HARQ.</li><li>PF/RR/MT balancing throughput, fairness, latency.</li></ul>`),
-Q("LTE-08","4G (LTE/LTE-A)","RSRP/RSRQ/SINR — roles in optimization.",`
-<ul><li><b>RSRP</b> coverage; <b>RSRQ</b> quality/load; <b>SINR</b> capacity potential.</li></ul>`),
-Q("LTE-09","4G (LTE/LTE-A)","Default vs Dedicated bearers and QoS.",`
-<ul><li>Default APN connectivity; dedicated adds service QoS (QCI/GBR) on demand.</li></ul>`),
-Q("LTE-10","4G (LTE/LTE-A)","VoLTE: why IMS, and SRVCC/CSFB differences.",`
-<ul><li>IMS (SIP) voice with QoS; <b>SRVCC</b> mid-call HO to CS; <b>CSFB</b> set-up in CS then back.</li></ul>`),
+        <!-- Glossary Modal -->
+        <div id="glossary-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>📖 Telecom Glossary</h3>
+                    <button class="modal-close" id="close-modal">✕</button>
+                </div>
+                <div class="modal-body">
+                    <div class="search-container">
+                        <input type="text" id="glossary-search" class="form-control" placeholder="🔍 Search abbreviations and terms...">
+                        <button class="search-clear" id="glossary-clear">✕</button>
+                    </div>
+                    <div id="glossary-content" class="glossary-content"></div>
+                </div>
+            </div>
+        </div>
 
-/* ===== 5G NR ===== */
-Q("NR-01","5G (NR)","SA vs NSA trade-offs and migration.",`
-<ul><li><b>NSA</b>: fast coverage using LTE anchor; limited slicing/URLLC.</li><li><b>SA</b>: full 5GC (<b>SBA</b>) → slicing, low latency; higher initial complexity.</li></ul>`),
-Q("NR-02","5G (NR)","Beamforming & Massive MIMO — how and benefits.",`
-<ul><li>Array beams raise <b>SINR</b>, capacity; <b>MU-MIMO</b> spatial reuse; digital/hybrid trade power vs RF chains.</li></ul>`),
-Q("NR-03","5G (NR)","5GC SBA — key NFs and rationale.",`
-<ul><li><b>AMF</b>, <b>SMF</b>, <b>UPF</b>, <b>PCF</b>, <b>UDM</b>, <b>NRF</b>, <b>NSSF</b>, <b>NEF</b>, <b>AF</b> with HTTP/2 APIs for discoverability and scaling.</li></ul>`),
-Q("NR-04","5G (NR)","Numerology (μ), SCS, (mini)slot implications.",`
-<ul><li>SCS=15×2^μ kHz: higher μ → lower TTI → lower latency but smaller cells.</li><li>Minislot for <b>URLLC</b> bursts.</li></ul>`),
-Q("NR-05","5G (NR)","DSS pros/cons.",`
-<ul><li>Fast NR coverage sharing LTE band; overhead reduces peak efficiency.</li></ul>`),
+        <!-- Share Modal -->
+        <div id="share-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>🔗 Share Your Progress</h3>
+                    <button class="modal-close" id="close-share-modal">✕</button>
+                </div>
+                <div class="modal-body">
+                    <p>Copy this URL to share your current progress and settings:</p>
+                    <div class="share-url-container">
+                        <input type="text" id="share-url" class="form-control" readonly>
+                        <button class="btn btn--primary" id="copy-url">📋 Copy</button>
+                    </div>
+                    <div class="share-stats">
+                        <h4>Your Progress:</h4>
+                        <ul>
+                            <li>Questions Mastered: <span id="share-mastered">0</span></li>
+                            <li>Completion Rate: <span id="share-completion">0%</span></li>
+                            <li>Active Filters: <span id="share-filters">All categories</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-/* ===== IoT ===== */
-Q("IoT-01","IoT","NB-IoT vs LTE-M — selection guide.",`
-<ul><li><b>NB-IoT</b>: 180 kHz, deep indoor, ultra-low power, tiny payloads.</li><li><b>LTE-M</b>: 1.4 MHz, mobility/VoLTE, higher data.</li></ul>`),
-Q("IoT-02","IoT","PSM/eDRX and reachability.",`
-<ul><li><b>PSM</b> long sleep; context kept, no paging.</li><li><b>eDRX</b> longer paging cycles → balance energy vs MT latency.</li></ul>`),
-
-/* ===== RAN ===== */
-Q("RAN-01","RAN","Disaggregated RAN (O-RAN): interfaces & value.",`
-<ul><li>RU/DU/CU split on open interfaces (<b>eCPRI, F1, E1, O1, A1</b>) → vendor mix, cloud scale, TCO control.</li></ul>`),
-Q("RAN-02","RAN","vRAN/CNF on COTS: accelerators and pitfalls.",`
-<ul><li>DPDK/FEC, CPU pinning, NUMA; watch jitter/noisy neighbors; strong observability.</li></ul>`),
-
-/* ===== Optimization ===== */
-Q("OPT-01","Optimization & Performance","High CDR playbook (first checks).",`
-<ul><li>RRC/DRB drop causes, RLF reasons, HO fails, <b>BLER</b>, RF alarms/backhaul KPIs.</li></ul>`),
-Q("OPT-02","Optimization & Performance","High RSRP but low data.",`
-<ul><li>Low <b>RSRQ/SINR</b> (interference), PRB exhaustion, QoS caps, backhaul bottlenecks, device limits.</li></ul>`),
-
-/* ===== Cloud ===== */
-Q("CLD-01","Cloud Technologies","NFV vs SDN and how they complement.",`
-<ul><li><b>NFV</b> virtualizes NFs (VNF/CNF); <b>SDN</b> centralizes control; together enable programmable telco cloud.</li></ul>`),
-Q("CLD-02","Cloud Technologies","What makes a CNF cloud-native?",`
-<ul><li>Microservices, containers, declarative ops, immutability, autoscaling, observability, resilience patterns.</li></ul>`),
-
-/* ===== HR ===== */
-Q("HR-01","Non-Technical (HR)","Tell me about yourself.",`
-<ul><li>60–90s story → current role → 1–2 wins → what you want next (aligned to role/team).</li></ul>`),
-Q("HR-02","Non-Technical (HR)","Why us? Why this role?",`
-<ul><li>Map your skills to their roadmap (Open RAN, 5GC, automation); show impact and learning goals.</li></ul>`)
-];
-
-/* ========= In-Depth Topic Engines (adds detailed sections automatically) ========= */
-const deepEngines = {
-  "4G (LTE/LTE-A)": (q)=>({
-    concepts: [
-      "EPC is an all-IP core that cleanly separates Control Plane (signaling, policy) from User Plane (actual packets). This lets you scale each side independently and apply per-service policies.",
-      "MME orchestrates access and mobility via NAS; S-GW anchors the user plane for mobility; P-GW connects to external Data Networks with QoS and charging; HSS stores subscriber identity and service permissions."
-    ],
-    steps: q.includes("Attach")
-      ? [
-        "UE powers on, selects PLMN and camps on a suitable cell.",
-        "RRC connection setup → NAS Attach Request (identity, capabilities, requested APN).",
-        "MME authenticates with HSS (AKA), sets security (ciphering/integrity).",
-        "Default EPS bearer established via S-GW and P-GW (IP alloc, QoS).",
-        "MME sends Attach Accept; UE completes; now has IP connectivity."
-      ]
-      : [
-        "Plan the split of CP/UP to scale signaling and data independently.",
-        "Ensure HSS profiles (APNs, QCI/ARP) reflect product offerings.",
-        "Tune paging/TA lists for balance of reachability and signaling."
-      ],
-    example: "A video-streaming UE receives a default bearer for best-effort browsing, and a dedicated bearer with GBR/QCI for voice (VoLTE) during a call to protect latency.",
-    kpis: ["Attach success rate", "TAU success rate", "Default/Dedicated bearer setup success", "Paging success/latency", "MME/SGW CPU and session counts"],
-    pitfalls: [
-      "APN misconfiguration causing bearer reject.",
-      "Incorrect TAC lists causing excess paging or TAU loops.",
-      "Under-dimensioned MME leading to signaling storms under events."
-    ],
-    followups: [
-      "How do you trace an attach failure end-to-end?",
-      "When would you assign a dedicated bearer and with which QCI?"
-    ]
-  }),
-  "5G (NR)": (q)=>({
-    concepts: [
-      "Stand-Alone (SA) uses a 5G Core (SBA) enabling slicing and low-latency features; Non-Standalone (NSA) reuses LTE EPC for a faster rollout at the cost of limited new capabilities.",
-      "Massive MIMO forms narrow beams to raise SINR and capacity; numerology lets you trade latency vs coverage via the Subcarrier Spacing."
-    ],
-    steps: q.includes("SBA")
-      ? [
-        "Network Functions (AMF/SMF/UPF/PCF/UDM/NRF/NSSF/NEF/AF) register and discover via NRF.",
-        "SMF selects UPF (possibly ULCL) and programs forwarding via N4.",
-        "Slices are selected via NSSF per service/UE policy."
-      ]
-      : [
-        "For NSA (EN-DC): ensure strong LTE anchor coverage and clean PCI/neighboring.",
-        "For SA: deploy sufficient gNB density and edge UPFs for URLLC/FWA scenarios."
-      ],
-    example: "A factory runs two slices: URLLC for robot control with edge UPF and strict latency SLOs; eMBB slice for staff tablets with high throughput but relaxed latency.",
-    kpis: ["Beam success rate", "CSI quality", "Slice admission success", "P95 latency per slice", "UPF throughput and drops"],
-    pitfalls: [
-      "DSS starving NR if LTE traffic dominates.",
-      "Improper beam grid leading to coverage scalloping.",
-      "Ignoring transport sync budgets for split 7-2x deployments."
-    ],
-    followups: [
-      "How would you debug poor VoNR call setup?",
-      "Which numerology would you select for 28 GHz FR2 small cells and why?"
-    ]
-  }),
-  "IoT": (q)=>({
-    concepts: [
-      "NB-IoT and LTE-M are LPWA variants under LTE optimized for power and coverage; PSM/eDRX are key levers for multi-year battery life.",
-      "CIoT optimizations cut signaling by sending small data over control plane or compressed user plane."
-    ],
-    steps: q.includes("PSM") || q.includes("eDRX")
-      ? [
-        "Estimate duty cycle and paging cycles based on use-case (e.g., meter every 4 hours).",
-        "Configure PSM timers and eDRX cycles to meet latency vs power targets.",
-        "Validate with real radio conditions; poor SINR inflates TX energy."
-      ]
-      : [
-        "Choose NB-IoT for deep indoor tiny telemetry; LTE-M for mobility/voice.",
-        "Leverage NIDD via SCEF/NEF for very small payloads without IP overhead."
-      ],
-    example: "A water meter posts 100 bytes every 6 hours via NB-IoT using long PSM; device batteries last ~10 years in typical RF conditions.",
-    kpis: ["Attach/RA success", "Paging responsiveness", "Average energy/event", "Firmware update success (FOTA)", "Reachability latency"],
-    pitfalls: [
-      "Setting eDRX too long for devices that must be reachable for alarms.",
-      "Ignoring FOTA bandwidth and retry plans; bricking devices at scale."
-    ],
-    followups: [
-      "How do you size PSM/eDRX for fire alarms vs water meters?",
-      "When would you switch to LTE-M for a moving asset tracker?"
-    ]
-  }),
-  "RAN": (q)=>({
-    concepts: [
-      "Disaggregation (RU/DU/CU) plus open interfaces (eCPRI, F1/E1, O1/A1) enables vendor mix and cloud scale.",
-      "Mobility depends on clean neighbor plans, PCI uniqueness, appropriate TTT/hysteresis, and beam design."
-    ],
-    steps: q.includes("vRAN")
-      ? [
-        "Pin critical threads, align NUMA/hugepages, isolate noisy neighbors.",
-        "Offload PHY where needed (FEC/DPDK); ensure PTP/SyncE is healthy."
-      ]
-      : [
-        "Audit neighbors and PCI; align TDD patterns across clusters.",
-        "Plan SSB beams with clutter maps; verify with drive tests."
-      ],
-    example: "A dense urban cluster adds small cells; eICIC/FeICIC protect cell edge while macros reduce power during ABS.",
-    kpis: ["HO prep/success", "RLF rate", "PRACH success", "BLER", "PRB utilization"],
-    pitfalls: [
-      "PCI collisions/confusion causing wrong handovers.",
-      "TDD misalignment → cross-link interference and uplink collapse."
-    ],
-    followups: [
-      "How to fix ping-pong between two hotspots?",
-      "What symptoms indicate PTP clock drift at the DU?"
-    ]
-  }),
-  "Optimization & Performance": (q)=>({
-    concepts: [
-      "Always localize the bottleneck: RF (SINR), Scheduler/PRB, Transport/Backhaul, or Compute.",
-      "CDR is multifactorial—separate RRC vs DRB drops, radio vs core vs transport."
-    ],
-    steps: q.includes("CDR")
-      ? [
-        "Segment drops: access, HO, RLF, core.",
-        "Inspect SINR/RSRQ, BLER; check neighbor relations and thresholds.",
-        "Check backhaul latency/jitter; look for HW alarms and PIM."
-      ]
-      : [
-        "High RSRP + low data → check RSRQ/SINR first (interference/load).",
-        "Correlate PRB usage, scheduler policy, device categories/CA combos."
-      ],
-    example: "Users near a stadium see high RSRP but poor throughput on match days—PRBs saturate; fix via temporary small-cells and scheduler tuning.",
-    kpis: ["RRC drop", "DRB drop", "HO failure", "BLER", "PRB utilization", "Latency/jitter"],
-    pitfalls: [
-      "Chasing PRB when the true limit is SINR.",
-      "Ignoring TCP/app behavior (windowing, RTT) while tuning only RF."
-    ],
-    followups: [
-      "What quick wins do you apply in the first 48 hours after launch?",
-      "How do you decide compute scale-up vs adding spectrum?"
-    ]
-  }),
-  "Cloud Technologies": (q)=>({
-    concepts: [
-      "NFV decouples NFs from hardware (VNFs/CNFs). SDN centralizes forwarding control—together they create a programmable telco cloud.",
-      "CNFs follow cloud-native tenets: microservices, immutable images, declarative ops, autoscaling, and strong observability."
-    ],
-    steps: q.includes("CNF")
-      ? [
-        "Containerize NFs, define resources/affinity, expose metrics/logs/traces.",
-        "Automate deployments (GitOps/CI-CD), design safe rollouts (canary/blue-green)."
-      ]
-      : [
-        "Introduce SDN to program transport paths; enforce QoS/DSCP per slice.",
-        "Place UPFs near users/apps that need low RTT; protect with zero-trust."
-      ],
-    example: "A UPF on edge K8s nodes uses DPDK with CPU pinning and hugepages; a mesh provides mTLS for CP APIs while data plane avoids sidecars.",
-    kpis: ["UPF pps/Gbps", "P95 latency", "Packet drops", "Pod restarts", "SLO per slice"],
-    pitfalls: [
-      "Noisy neighbors and NUMA mismatch tanking UPF performance.",
-      "Treating CNFs like VMs (pet servers) instead of immutable cattle."
-    ],
-    followups: [
-      "How to upgrade 5GC with zero downtime?",
-      "Where to terminate mTLS and how to avoid data-plane overhead?"
-    ]
-  }),
-  "Non-Technical (HR)": (q)=>({
-    concepts: [
-      "Interviewers assess impact, collaboration, clarity, and self-awareness, not just knowledge.",
-      "STAR (Situation, Task, Action, Result) turns experiences into crisp, measurable stories."
-    ],
-    steps: q.includes("yourself")
-      ? ["Present a 60–90s arc: Now → Past → Proof (wins) → Next (fit)."]
-      : ["Translate your work into business impact and customer outcomes; anticipate follow-ups."],
-    example: "“Led Open RAN trial across 12 sites → 18% CDR reduction and 22% throughput gain by day 10; automated KPI dashboards cut triage time by 40%.”",
-    kpis: ["Clarity", "Specificity", "Ownership", "Metrics", "Coachability"],
-    pitfalls: [
-      "Vague claims without numbers or collaborators.",
-      "Talking only about tech—skip the ‘so what’."
-    ],
-    followups: [
-      "What would you do differently next time?",
-      "How do you prioritize when three teams need you at once?"
-    ]
-  })
-};
-
-/* ========= Renderer with Depth Control ========= */
-const CATS = ["4G (LTE/LTE-A)","5G (NR)","IoT","RAN","Optimization & Performance","Cloud Technologies","Non-Technical (HR)"];
-const $ = (q,root=document)=>root.querySelector(q);
-const $$ = (q,root=document)=>Array.from(root.querySelectorAll(q));
-const state = {
-  selected: new Set(CATS),
-  hideMastered: false,
-  idx: 0,
-  showAnswer: false,
-  order: [],
-  mastered: new Set(JSON.parse(localStorage.getItem("mastered") || "[]")),
-  depth: localStorage.getItem("depth") || "standard"
-};
-function saveMastered(){ localStorage.setItem("mastered", JSON.stringify([...state.mastered])); }
-function setDepth(v){ state.depth=v; localStorage.setItem("depth", v); renderQuestion(); }
-
-function filteredIndices(){
-  return questions
-    .map((q,i)=>({i,q}))
-    .filter(o=>state.selected.has(o.q.category))
-    .filter(o=> state.hideMastered ? !state.mastered.has(o.q.id) : true)
-    .map(o=>o.i);
-}
-function seededShuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]];} return arr; }
-
-function buildFilters(){
-  const holder = $("#filters"); holder.innerHTML = "";
-  CATS.forEach(cat=>{
-    const id = "chk_"+cat.replace(/[^\w]/g,"");
-    const div = document.createElement("label");
-    div.className = "chip";
-    div.innerHTML = `<input type="checkbox" id="${id}" checked>
-                     <span>${cat}</span>`;
-    holder.appendChild(div);
-    $("#"+id).addEventListener("change", e=>{
-      e.target.checked ? state.selected.add(cat) : state.selected.delete(cat);
-      applyFilter(); syncURL();
-    });
-  });
-  $("#hideMastered").checked = state.hideMastered;
-  $("#hideMastered").addEventListener("change", e=>{
-    state.hideMastered = e.target.checked; applyFilter(); syncURL();
-  });
-}
-
-function updatePill(){ const n = state.order.length; $("#totalCountPill").textContent = `${n} question${n===1?"":"s"} in pool`; }
-
-function enrichAnswer(base, category, questionText){
-  if (state.depth==="concise") return base;
-  const engine = deepEngines[category];
-  if (!engine) return base;
-
-  const ctx = engine(questionText);
-  if (state.depth==="standard"){
-    return base + `
-    <div class="cols">
-      <div>
-        <h4>Why this matters</h4>
-        <ul>${ctx.concepts.slice(0,2).map(x=>`<li>${x}</li>`).join("")}</ul>
-      </div>
-      <div>
-        <h4>Quick example</h4>
-        <p>${ctx.example}</p>
-      </div>
-    </div>`;
-  }
-  // In-Depth
-  return base + `
-    <h4>Core Concepts</h4>
-    <ul>${ctx.concepts.map(x=>`<li>${x}</li>`).join("")}</ul>
-    <h4>Step-by-Step</h4>
-    <ol>${(ctx.steps||[]).map(x=>`<li>${x}</li>`).join("")}</ol>
-    <div class="cols">
-      <div>
-        <h4>Practical Example</h4>
-        <p>${ctx.example}</p>
-      </div>
-      <div>
-        <h4>KPIs & Metrics</h4>
-        <ul>${ctx.kpis.map(x=>`<li>${x}</li>`).join("")}</ul>
-      </div>
+        <footer class="footer">
+            <div class="footer-content">
+                <p><strong>Created by Bhooshan Pattanashetti</strong></p>
+                <p class="footer-note">Industry-accurate telecom content for professional interview preparation</p>
+            </div>
+        </footer>
     </div>
-    <h4>Common Pitfalls</h4>
-    <ul>${ctx.pitfalls.map(x=>`<li>${x}</li>`).join("")}</ul>
-    <h4>Interviewer Follow-ups</h4>
-    <ul>${ctx.followups.map(x=>`<li>${x}</li>`).join("")}</ul>`;
-}
 
-function renderQuestion(){
-  const qEl = $("#question"), aEl = $("#answer"), tag = $("#tag"), qid = $("#qid"), card = $("#card");
-  if (!state.order.length){
-    qEl.textContent = "No questions match your current filter. Adjust topics or unhide mastered.";
-    aEl.classList.remove("open"); aEl.setAttribute("aria-hidden","true"); aEl.innerHTML = "";
-    tag.textContent = "—"; qid.textContent = "—"; $("#masteredToggle").checked = false; card.classList.remove("mastered"); $("#posLabel").textContent = "0/0"; return;
-  }
-  const qi = state.order[state.idx], q = questions[qi];
-  tag.textContent = q.category; qid.textContent = q.id; qEl.innerHTML = q.question;
-  const enriched = enrichAnswer(q.answer, q.category, q.question);
-  aEl.innerHTML = enriched;
-  if (state.showAnswer){ aEl.classList.add("open"); aEl.setAttribute("aria-hidden","false"); $("#revealBtn").textContent="Hide Answer"; }
-  else { aEl.classList.remove("open"); aEl.setAttribute("aria-hidden","true"); $("#revealBtn").textContent="Reveal Answer"; }
-  const m = state.mastered.has(q.id); $("#masteredToggle").checked = m; card.classList.toggle("mastered", m);
-  $("#posLabel").textContent = `${state.idx+1}/${state.order.length}`;
-}
-
-function updateProgress(){
-  const total = state.order.length || 1;
-  const pct = Math.round(((state.idx+1)/total)*100);
-  $("#bar").style.width = pct+"%";
-  $("#counter").textContent = `Question ${state.idx+1} of ${total}`;
-  $(".progress").setAttribute("aria-valuenow", pct);
-}
-
-function applyFilter(){
-  state.order = filteredIndices();
-  if (state.idx >= state.order.length) state.idx = 0;
-  updatePill(); renderQuestion(); updateProgress();
-}
-
-/* ========= Glossary ========= */
-function renderGlossary(filter=""){
-  const g = $("#glossary"); g.innerHTML = "";
-  const f = filter.trim().toLowerCase();
-  const entries = Object.entries(ABBR).sort((a,b)=>a[0].localeCompare(b[0]));
-  let shown = 0;
-  entries.forEach(([abbr,full])=>{
-    const hay = (abbr+" "+full).toLowerCase();
-    if (!f || hay.includes(f)){
-      const d = document.createElement("div"); d.className="def";
-      const safe = (txt)=>txt.replace(/[&<>]/g,s=>({ "&":"&amp;","<":"&lt;",">":"&gt;"}[s]));
-      const hi = (txt)=> f ? safe(txt).replace(new RegExp(`(${f.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")})`,"ig"),"<mark>$1</mark>") : safe(txt);
-      d.innerHTML = `<div class="abbr">${hi(abbr)}</div><div>${hi(full)}</div>`;
-      g.appendChild(d); shown++;
-    }
-  });
-  $("#glossCount").textContent = `${shown} item${shown===1?"":"s"}`;
-}
-
-/* ========= URL Share ========= */
-function encodeState(){
-  const params = new URLSearchParams();
-  params.set("cat", [...state.selected].map(encodeURIComponent).join(","));
-  params.set("hide", state.hideMastered ? "1":"0");
-  params.set("i", String(state.idx));
-  params.set("d", state.depth);
-  return params.toString();
-}
-function syncURL(){ history.replaceState(null,"",`${location.origin}${location.pathname}?${encodeState()}`); }
-function loadFromURL(){
-  const sp = new URLSearchParams(location.search);
-  const cats = sp.get("cat"); const hide = sp.get("hide"); const i = sp.get("i"); const d = sp.get("d");
-  if (cats){
-    state.selected = new Set(cats.split(",").map(decodeURIComponent).filter(c=>CATS.includes(c)));
-    if (!state.selected.size) state.selected = new Set(CATS);
-  }
-  if (hide) state.hideMastered = hide==="1";
-  if (i) state.idx = Math.max(0, parseInt(i,10)||0);
-  if (d && ["concise","standard","indept"].includes(d)) state.depth = d;
-}
-
-/* ========= Controls ========= */
-function next(){ if(state.order.length){ state.idx = (state.idx+1)%state.order.length; state.showAnswer=false; renderQuestion(); updateProgress(); syncURL(); } }
-function prev(){ if(state.order.length){ state.idx = (state.idx-1+state.order.length)%state.order.length; state.showAnswer=false; renderQuestion(); updateProgress(); syncURL(); } }
-function rand(){ if(state.order.length){ state.idx = Math.floor(Math.random()*state.order.length); state.showAnswer=false; renderQuestion(); updateProgress(); syncURL(); } }
-
-/* ========= Init ========= */
-function init(){
-  loadFromURL();
-  buildFilters();
-  // reflect URL state in checkboxes
-  CATS.forEach(cat=>{
-    const id = "#chk_"+cat.replace(/[^\w]/g,""); const el = $(id);
-    if (el) el.checked = state.selected.has(cat);
-  });
-  $("#hideMastered").checked = state.hideMastered;
-  $("#depthSel").value = state.depth;
-
-  state.order = filteredIndices();
-  updatePill(); renderQuestion(); updateProgress(); renderGlossary(); syncURL();
-
-  // Q/A controls
-  $("#revealBtn").addEventListener("click", ()=>{ state.showAnswer = !state.showAnswer; renderQuestion(); });
-  $("#nextBtn").addEventListener("click", next);
-  $("#prevBtn").addEventListener("click", prev);
-  $("#randomBtn").addEventListener("click", rand);
-  $("#shuffleBtn").addEventListener("click", ()=>{
-    state.order = seededShuffle(filteredIndices());
-    state.idx = 0; state.showAnswer=false; renderQuestion(); updateProgress(); syncURL();
-  });
-  $("#resetMastered").addEventListener("click", ()=>{
-    if (confirm("Clear mastered marks for all questions?")){ state.mastered.clear(); saveMastered(); renderQuestion(); applyFilter(); }
-  });
-  $("#masteredToggle").addEventListener("change", e=>{
-    if (!state.order.length) return;
-    const q = questions[state.order[state.idx]];
-    if (e.target.checked) state.mastered.add(q.id); else state.mastered.delete(q.id);
-    saveMastered(); $("#card").classList.toggle("mastered", e.target.checked);
-    if (state.hideMastered){ applyFilter(); }
-  });
-  $("#shareBtn").addEventListener("click", async ()=>{
-    const url = `${location.origin}${location.pathname}?${encodeState()}`;
-    try{ await navigator.clipboard.writeText(url); alert("Shareable link copied:\n\n"+url); }
-    catch{ prompt("Copy your shareable link:", url); }
-  });
-
-  // Depth
-  $("#depthSel").addEventListener("change", (e)=>{ setDepth(e.target.value); syncURL(); });
-
-  // Glossary search
-  const gs = $("#glossSearch");
-  gs.addEventListener("input", ()=> renderGlossary(gs.value));
-
-  // Keyboard shortcuts
-  window.addEventListener("keydown", e=>{
-    if (["INPUT","TEXTAREA","SELECT"].includes(document.activeElement.tagName)) return;
-    if (e.key==="ArrowRight") next();
-    else if (e.key==="ArrowLeft") prev();
-    else if (e.key.toLowerCase()==="r") rand();
-    else if (e.key.toLowerCase()==="a"){ state.showAnswer=!state.showAnswer; renderQuestion(); }
-    else if (e.key.toLowerCase()==="m"){ const t=$("#masteredToggle"); t.checked=!t.checked; t.dispatchEvent(new Event("change")); }
-  });
-}
-document.addEventListener("DOMContentLoaded", init);
-</script>
+    <script src="app.js"></script>
 </body>
 </html>
